@@ -352,24 +352,6 @@ record_to_map({Id, From, Msg}) ->
     #{sender => Jbin, timestamp => round(Msec / 1000000), message_id => MsgId,
       body => Body}.
 
-%%build_packet(message_chat, Body, To, Subject) ->
-%%  #xmlel{
-%%    name = <<"message">>,
-%%    attrs = [
-%%      {<<"type">>, <<"chat">>},
-%%        {<<"to">>, To},
-%%      {<<"id">>, list_to_binary(randoms:get_string())}
-%%    ],
-%%    children = [
-%%      #xmlel{name = <<"body">>, children = [
-%%        #xmlcdata{content = Body}
-%%      ]},
-%%      #xmlel{name = <<"subject">>, children = [
-%%        #xmlcdata{content = Subject}
-%%      ]}
-%%    ]
-%%  }.
-
 build_packet(message_chat, Body, _To, _Subject) ->
   #xmlel{name = <<"message">>,
     attrs = [{<<"type">>, <<"chat">>},
@@ -378,19 +360,19 @@ build_packet(message_chat, Body, _To, _Subject) ->
       children = [#xmlcdata{content = Body}]}]
   }.
 
-build_packet(message_chat, Body, To, Subject) ->
-    #xmlel{
-      name = <<"message">>,
-      attrs = [
-        {<<"type">>, <<"chat">>},
-        {<<"to">>, To},
-        {<<"id">>, list_to_binary(randoms:get_string())}
-      ],
-      children = [
-        #xmlel{name = <<"body">>, children = [#xmlcdata{content = Body}]},
-        #xmlel{name = <<"subject">>, children = [#xmlcdata{content = Subject}]}
-      ]
-    }.
+%%build_packet(message_chat, Body, To, Subject) ->
+%%    #xmlel{
+%%      name = <<"message">>,
+%%      attrs = [
+%%        {<<"type">>, <<"chat">>},
+%%        {<<"to">>, To},
+%%        {<<"id">>, list_to_binary(randoms:get_string())}
+%%      ],
+%%      children = [
+%%        #xmlel{name = <<"body">>, children = [#xmlcdata{content = Body}]},
+%%        #xmlel{name = <<"subject">>, children = [#xmlcdata{content = Subject}]}
+%%      ]
+%%    }.
 
 lookup_recent_messages(_, _, _, Limit) when Limit > 500 ->
     throw({error, message_limit_too_high});
