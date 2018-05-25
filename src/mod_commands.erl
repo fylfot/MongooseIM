@@ -22,7 +22,7 @@
          kick_session/3,
          get_recent_messages/3,
          get_recent_messages/4,
-         send_message/3
+         send_message/4
         ]).
 
 -include("ejabberd.hrl").
@@ -181,7 +181,7 @@ commands() ->
       {function, send_message},
       {action, create},
       {security_policy, [user]},
-      {args, [{caller, binary}, {to, binary}, {body, binary}]},
+      {args, [{caller, binary}, {to, binary}, {body, binary}, {subject, binary}]},
       {result, ok}
      ],
      [
@@ -258,10 +258,10 @@ unregister(Host, User) ->
     ejabberd_auth:remove_user(User, Host),
     <<"">>.
 
-send_message(From, To, Body) ->
-    Packet = build_packet(message_chat, Body),
+send_message(From, To, Body, Subject) ->
     F = jid:from_binary(From),
     T = jid:from_binary(To),
+    Packet = build_packet(message_chat, Body, T, Subject),
     ejabberd_hooks:run(user_send_packet,
                        F#jid.lserver,
                        [F, T, Packet]),
@@ -352,13 +352,19 @@ record_to_map({Id, From, Msg}) ->
     #{sender => Jbin, timestamp => round(Msec / 1000000), message_id => MsgId,
       body => Body}.
 
-build_packet(message_chat, Body) ->
-    #xmlel{name = <<"message">>,
-           attrs = [{<<"type">>, <<"chat">>},
-                    {<<"id">>, list_to_binary(randoms:get_string())}],
-           children = [#xmlel{name = <<"body">>,
-                              children = [#xmlcdata{content = Body}]}]
-          }.
+build_packet(message_chat, Body, To, Subject) ->
+    #xmlel{
+      name = <<"message">>,
+      attrs = [
+        {<<"type">>, <<"chat">>},
+        {<<"to">>, To},
+        {<<"id">>, list_to_binary(randoms:get_string())}
+      ],
+      children = [
+        #xmlel{name = <<"body">>, children = [#xmlcdata{content = Body}]},
+        #xmlel{name = <<"subject">>, children = [#xmlcdata{content = Subject}]}
+      ]
+    }.
 
 lookup_recent_messages(_, _, _, Limit) when Limit > 500 ->
     throw({error, message_limit_too_high});
