@@ -259,7 +259,7 @@ unregister(Host, User) ->
     ejabberd_auth:remove_user(User, Host),
     <<"">>.
 
-send_message(From, To, Body) ->
+send_message(From, To, Body, Subject) ->
     F = jid:from_binary(From),
     T = jid:from_binary(To),
     Packet = build_packet(message_chat, Body, To, Subject),
