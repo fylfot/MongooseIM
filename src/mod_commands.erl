@@ -361,12 +361,8 @@ build_packet(message_chat, Body, To, Subject) ->
         {<<"id">>, list_to_binary(randoms:get_string())}
       ],
       children = [
-        #xmlel{name = <<"body">>, children = [
-          #xmlcdata{content = Body}
-        ]}%,
-%%        #xmlel{name = <<"subject">>, children = [
-%%          #xmlcdata{content = Subject}
-%%        ]}
+        #xmlel{name = <<"body">>, children = [#xmlcdata{content = Body}]},
+        #xmlel{name = <<"subject">>, children = [#xmlcdata{content = Subject}]}
       ]
     }.
 
